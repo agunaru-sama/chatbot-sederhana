@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Dark Mode</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #121212; /* Background gelap */
+            color: #e0e0e0; /* Warna teks */
+            overflow: hidden; /* Menghindari scroll */
+        }
+        .chat-container {
+            width: 100%;
+            max-width: 400px; /* Lebar maksimum */
+            height: 100vh; /* Memanfaatkan tinggi layar penuh */
+            display: flex;
+            flex-direction: column;
+            border-radius: 8px;
+            background-color: #1e1e1e; /* Background chat */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background-color: #333;
+            border-bottom: 1px solid #444;
+        }
+        .header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            border-bottom: 1px solid #333;
+        }
+        .chat-box .message {
+            margin-bottom: 10px;
+            border-radius: 8px;
+            padding: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+            display: inline-block;
+            clear: both;
+        }
+        .chat-box .user-message {
+            background-color: #007bff;
+            color: #fff;
+            text-align: right;
+            margin-left: auto;
+            margin-right: 0;
+            float: right;
+        }
+        .chat-box .bot-message {
+            background-color: #333;
+            color: #e0e0e0;
+            text-align: left;
+            margin-left: 0;
+            margin-right: auto;
+            float: left;
+        }
+        .input-container {
+            display: flex;
+            border-top: 1px solid #333;
+            background: #1e1e1e;
+        }
+        .input-container textarea {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            border-radius: 8px 0 0 8px;
+            font-size: 16px;
+            resize: none;
+            overflow: hidden;
+            background-color: #333; /* Background text area */
+            color: #e0e0e0; /* Warna teks input */
+        }
+        .input-container button {
+            padding: 10px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+        }
+        .input-container button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="header">
+            <img src="https://via.placeholder.com/40" alt="Chatbot Avatar"> <!-- Ganti dengan URL gambar avatar -->
+            <h1>chatbot</h1>
+        </div>
+        <div class="chat-box" id="chatBox"></div>
+        <div class="input-container">
+            <textarea id="userInput" rows="1" placeholder="ketik pesan..."></textarea>
+            <button id="sendButton">kirim</button>
+        </div>
+    </div>
+
+    <script>
+        const textarea = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        const chatBox = document.getElementById('chatBox');
+
+        function adjustTextareaHeight() {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        }
+
+        function sendMessage() {
+            const userMessage = textarea.value.trim();
+
+            if (userMessage) {
+                // Display user message
+                const userMessageDiv = document.createElement('div');
+                userMessageDiv.className = 'message user-message';
+                userMessageDiv.textContent = userMessage;
+                chatBox.appendChild(userMessageDiv);
+
+                // Clear input field
+                textarea.value = '';
+                adjustTextareaHeight();
+
+                // Scroll to the bottom
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                // Simulate bot response
+                setTimeout(() => {
+                    const botMessage = getBotResponse(userMessage);
+                    const botMessageDiv = document.createElement('div');
+                    botMessageDiv.className = 'message bot-message';
+                    botMessageDiv.textContent = botMessage;
+                    chatBox.appendChild(botMessageDiv);
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }, 500);
+            }
+        }
+
+        function getBotResponse(userMessage) {
+            const responses = [
+                { keywords: ['halo'], response: 'hai! ada yang bisa aku bantu?' },
+                { keywords: ['apa kabar'], response: 'aku baik, makasih! kamu gimana?' },
+                { keywords: ['siapa kamu'], response: 'aku chatbot sederhana. mau tanya apa?' },
+                { keywords: ['terima kasih'], response: 'sama-sama! ada yang lain yang bisa aku bantu?' },
+                { keywords: ['bye'], response: 'daaa! semoga harimu asik!' },
+                { keywords: ['help'], response: 'aku disini buat bantuin kamu. ada yang perlu dibantu?' },
+                { keywords: ['jam berapa'], response: 'saat ini pukul ' + getCurrentTime() + '.' },
+                { keywords: ['selamat pagi'], response: 'selamat pagi! semoga hari kamu cerah.' },
+                { keywords: ['selamat sore'], response: 'selamat sore! ada yang bisa aku bantu?' },
+                { keywords: ['selamat malam'], response: 'selamat malam! tidur nyenyak ya.' },
+                { keywords: ['gimana'], response: 'aku baik-baik aja. kamu gimana?' },
+                { keywords: ['ngapain'], response: 'lagi ngobrol sama kamu. ada yang mau ditanya?' },
+                { keywords: ['mau ngapain'], response: 'tanya aja, aku siap bantu!' },
+                { keywords: ['apa yang kamu lakuin'], response: 'lagi jawab pertanyaan dari kamu!' },
+                { keywords: ['kabar'], response: 'kabar aku baik, kamu sendiri?' },
+                { keywords: ['halo semua'], response: 'halo! ada yang bisa aku bantu?' },
+                { keywords: ['apa yang terjadi'], response: 'aku lagi ngobrol sama kamu. ada yang mau ditanya?' },
+                { keywords: ['kenapa'], response: 'kenapa apa? jelasin lebih lanjut.' },
+                { keywords: ['bagaimana'], response: 'gimana apa? coba ceritakan lebih lanjut.' },
+                { keywords: ['sudah makan'], response: 'belum, aku cuma chatbot. kamu udah makan?' },
+                { keywords: ['siapa nama kamu'], response: 'aku belum punya nama. panggil aku chatbot aja.' },
+                { keywords: ['mau ngobrol tentang apa'], response: 'aku bisa ngobrol tentang banyak hal. kamu mau bahas apa?' },
+                { keywords: ['hobi'], response: 'berbicara dengan mu adalah hobi ku' }
+            ];
+
+            const userMessageLower = userMessage.toLowerCase();
+
+            // Find the best match
+            for (let i = 0; i < responses.length; i++) {
+                for (let keyword of responses[i].keywords) {
+                    if (userMessageLower.includes(keyword)) {
+                        return responses[i].response;
+                    }
+                }
+            }
+
+            // Default response
+            return 'maaf, aku tidak paham apa yang kamu maksud.';
+        }
+
+        function getCurrentTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        textarea.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Prevent newline in textarea
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
